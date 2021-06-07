@@ -1,10 +1,12 @@
 `#include "myNM.h"`
 
-## Nonlinear Solver 
-
-
+## Non-Linear System Solver
 
 ### Bisection()
+
+---
+
+
 
 finds an approximation for the root of real-valued function, f(x)=-0
 
@@ -38,6 +40,10 @@ finds an approximation for the root of real-valued function, f(x)=-0
 
 ###  NewtonRaphson()
 
+----
+
+
+
 finds an approximation for the root of real-valued function, f(x). It uses initial value of x. However, inappropriate selection of initial value will make the solution diverge.
 
 `double newtonraphson(double _x0, double _tol)`
@@ -59,6 +65,10 @@ finds an approximation for the root of real-valued function, f(x). It uses initi
   ```
 
 ### Secant() 
+
+----
+
+
 
 finds an approximation for the root of real-valued function, f(x)=-0. Secant method complements Newton Raphson's method, which has shortcomings of divergence, by using slope of the two points of the given function
 
@@ -89,7 +99,7 @@ finds an approximation for the root of real-valued function, f(x)=-0. Secant met
 
 
 
-# Linear Solver
+# Linear System Solver
 
 ### addMat()
 
@@ -446,6 +456,7 @@ This function serves as finding inverse matrix of given matrix A. In this functi
 #### Parameters
 
 * Matrix _A : input matrix A which has size of (nxn)
+* It returns inverse matrix of A ,size of(nxn)
 
 #### Example Codes
 
@@ -467,6 +478,7 @@ This function serves as QR factorization of given Matrix A. This function implem
 #### Parameters
 
 * Matrix _A : input Matrix A with size of (nxn)
+* In this function, we can notice that Q and R matrix declared in the function is changed while the for loop ends. When for loop is terminated,  eigenvalues can be found at the diagonal components of Matrix R
 
 #### Example Codes
 
@@ -488,74 +500,137 @@ In this function, eigenvalues can be found by iterating QR factorization. Ultima
 #### Parameters
 
 * Matrix _A : Input Matrix A with size of (nxn)
+* returns eigenvalues of given Matrix A in matrix form, size of (nx1)
 
 ####  Example Codes 
 
 ```c
 Matrix matA = txt2Mat(path, "prob1_matA");
+Matrix lam = createMat(A.rows,1);
 lam = lamda(matA);
 ```
 
+### Cond() 
+
+---
 
 
-## gaussElim()
 
-solves for vector **x** from  Ax=b,  a linear system problem  
+in this function, by giving input matrix A, it is possible to calculate its condition number characterized by singular value.
 
-```c
-void	gaussElim(Matrix _A, Matrix _B, Matrix* _U, Matrix* _B_out);
-```
+`double cond(Matrix _A)`
 
-#### **Parameters**
+#### Parameters 
 
-- **A**:  Matrix **A** in structure Matrix form.  Should be (nxn) square.
+* Matrix _A : input Matrix A with size of (nx1), here, A represents eigenvalues of original Matrix
+* Returns condition number for eigenvalues in scalar forms.
 
-- **B**:  vector  **b** in structure Matrix form.  Should be (nx1) 
-
-  
-
-## solveLinear()
-
-solves for vector **x** from  Ax=b,  a linear system problem  
+#### Example Codes
 
 ```c
-extern Matrix solveLinear(Matrix _A, Matrix _b, char* _method)
+/* Main Function */
+Matrix matA = txt2Mat(path,"prob1_matA");
+Matrix lam = createMat(A.rows,1);
+lam = lamda(matA);
+double con;
+con = cond(lam);
+/* Main Function Ends */
+
 ```
 
-#### **Parameters**
+## Curve Fitting, Interpolation
 
-- **A**:  Matrix **A** in structure Matrix form.  Should be (nxn) square.
+### linearFit()
 
-- **b**:  vector  **b** in structure Matrix form.  Should be (nx1) 
+----
 
-- **method:  character type,** 
 
-  - **'lu' :** LU decomposition
-  - **'gauss':** Gauss elimination
 
-  
+This function gives least square approximation for the linear function. That is, it gives coefficient for the linear least square fitting function f(x)=a0+a1x.
 
-#### Example code
+`Matrix linearFit(Matrix _x, Matrix _y)`
+
+#### Parameters
+
+* Matrix _x : Input x data sets, should be a vector form and (nx1) size
+* Matrix _y : Input y data sets, should be a vector form and (nx1) size with size of same as _x
+* Returns fitting coefficient a0 and a1 in (2x1) matrix form.
+
+#### Example Codes
+
+```c
+int main(int argc, char* argv[])
+{
+	int M = 6;
+	double T_array[] = { 30, 40, 50, 60, 70, 80 };
+	double P_array[] = { 1.05, 1.07, 1.09, 1.14, 1.17, 1.21 };
+
+	Matrix T = arr2Mat(T_array, M, 1);
+	Matrix P = arr2Mat(P_array, M, 1);
+
+	Matrix z = linearFit(T, P);
+
+	printMat(T, "T");
+	printMat(P, "P");
+	printMat(z, "z");
+
+	system("pause");
+	return 0;
+}
+```
+
+### arr2Mat()
+
+---
+
+
+
+This function gets array as a input and transform its components as a form of matrix.
+
+`Matrix	arr2Mat(double* _1Darray, int _rows, int _cols)`
+
+#### Parameters
+
+* double* _1Darray : one-dimensional array that has 1 column with n rows. That is,(nx1) size
+* int _rows: number of rows of input that user gives
+* int _cols : number of columns of input that user gives (mostly 1 columns)
+
+#### Example Codes
+
+```c
+	int M = 6;
+	double T_array[] = { 30, 40, 50, 60, 70, 80 };
+	double P_array[] = { 1.05, 1.07, 1.09, 1.14, 1.17, 1.21 };
+
+	Matrix T = arr2Mat(T_array, M, 1);
+	Matrix P = arr2Mat(P_array, M, 1);
+```
+
+### linearInterp()
+
+This function gives linear interpolated values for given data. 
+
+`Matrix   linearInterp(Matrix _x, Matrix _y, Matrix _xq)`
+
+#### Parameters
+
+* Matrix _x : input x datasets with length of rows of x, n. it should be (nx1) size
+* Matrix _y : input y datasets with length of rows of y, n. it should be (nx1) size
+* Matrix _xq : input query input datasets with length of m. it should be (mx1) size
+* Returns interpolated value with size of (mx1) vector 
+
+#### Example Codes
 
 ```C
-double A_array[] = { 1, 3, -2, 4,		2, -3, 3, -1,		-1, 7, -4, 2,		-1, 7, -4, 2 };
-double b_array[] = { -11,		6,		-9,		15 };
-
-Matrix matA = arr2Mat(A_array, M, N);
-Matrix vecb = arr2Mat(b_array, M, 1);
-
-Matrix x_lu = solveLinear(matA, vecb, "LU");
-Matrix invA_gj = inv(matA, "gj");
-Matrix invA_lu = inv(matA, "LU");
+	Matrix T = txt2Mat(path, "prob1_vecT");
+	Matrix P = txt2Mat(path, "prob1_vecP");
+	int n = 21;
+	double xq_array[] = { 0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100 };
+	Matrix xq = arr2Mat(xq_array, n,1);
+	Matrix ypoly = linearInterp(T, P, xq);
 ```
 
-
-
-
-
-***
-
-
+----
 
 # Numerical Differentiation
 
@@ -564,12 +639,12 @@ Matrix invA_lu = inv(matA, "LU");
 Solves for numerical gradient  (dy/dt) from  a set of discrete data
 
 ```c
-Matrix	gradient(Matrix _t, Matrix _y);
+Matrix	gradient(Matrix _x, Matrix _y) 
 ```
 
 #### **Parameters**
 
-- **t**:  vector **t** in structure Matrix form.  Should be (nx1) vector
+- **x**:  vector **t** in structure Matrix form.  Should be (nx1) vector
 - **y**:  vector  **y** in structure Matrix form.  Should be (nx1) vector and same length as t
 - Returns **dydt** in structure Matrix form. Output is also (nx1) vector
 
@@ -578,17 +653,412 @@ Matrix	gradient(Matrix _t, Matrix _y);
 #### Example code
 
 ```c
-Matrix t = txt2Mat("", "Q1_vect");
-Matrix x = txt2Mat("", "Q1_vecx");
-
-Matrix vel = gradient(t, x);
-Matrix acc = gradient(t, vel);
-
-printMat(t, "t");
-printMat(x, "x");
-printMat(vel, "vel");
-printMat(acc, "acc");
+double t_array[] = { 0,0.2,0.4,0.6,0.8,1.0,1.2,1.4,1.6,1.8,2.0,2.2,2.4,2.6,2.8,3.0,3.2,3.4,3.6,3.8,4.0 };
+	double x_array[] = { -5.87, -4.23, -2.55, -0.89, 0.67, 2.09, 3.31, 4.31, 5.06, 5.55, 5.78, 5.77, 5.52, 5.08, 4.46, 3.72, 2.88, 2.00, 1.10, 0.23, -0.59 };                                  
+	int len = sizeof(t_array) / sizeof(double);
+	Matrix xa = arr2Mat(x_array, len, 1);
+	Matrix ta = arr2Mat(t_array, len, 1);
+	int n = len;
+	Matrix grad=gradient(ta, xa);        
+	printMat(grad, "vel");
+	Matrix acc = gradient(ta, grad);
 ```
 
-See full example code:  [TutorialDifferentiation.cpp](https://github.com/ykkimhgu/tutorial-NM/blob/main/samples/Tutorial-Differentiation.cpp)
+***
+
+
+
+### gradient1D()
+
+---
+
+
+
+In this function, instead of using Matrix form, array form of data is used to find gradient of given datasets. 
+
+`void gradient1D(double x[], double y[], double dydx[], int n)`
+
+#### Parameters
+
+* double x[] : Input x datasets as a form of array
+* double y[] : Input y datasets as a form of array, length of y should be equal to that of x
+* double dydx[] : Output datasets which is calculated and filled in the function
+* int n : Length of given datasets
+* Returns dydx as a form of 1D array
+
+#### Example Codes
+
+```c
+	double t_array[] = { 0,0.2,0.4,0.6,0.8,1.0,1.2,1.4,1.6,1.8,2.0,2.2,2.4,2.6,2.8,3.0,3.2,3.4,3.6,3.8,4.0 };
+	double x_array[] = { -5.87, -4.23, -2.55, -0.89, 0.67, 2.09, 3.31, 4.31, 5.06, 5.55, 5.78, 5.77, 5.52, 5.08, 4.46, 3.72, 2.88, 2.00, 1.10, 0.23, -0.59 };                                  
+	int len = sizeof(t_array) / sizeof(double);
+	double _dydx[21] = {0};
+	gradient1D(t_array, x_array, _dydx, len);
+```
+
+### func_call()
+
+---
+
+
+
+This function serves as function value call corresponding to given input xin
+
+`void func_call(double func(const double x), double xin)`
+
+#### Parameters 
+
+* double func(const double x) : reference function declared in main 
+* double xin : reference x value determined in main
+* it returns function value as a form of scalar
+
+#### Example Codes
+
+````C
+void func_call(double func(const double x), double xin)
+{
+	double yout = func(xin);
+	printf("Y_out by my_func1 = %f\n", yout);
+
+ }
+````
+
+### gradientFunc()
+
+----
+
+
+
+This function gives gradient of given function, not datasets. thus, input will be  reference function, and xin values.
+
+`Matrix	gradientFunc(double func(const double x), Matrix xin)`
+
+#### Parameters
+
+* double func(const double x) : reference function declared in main
+* Matrix xin : reference xin values which has (nx1) length.
+
+#### Example Codes
+
+```c
+	double x_inputarr[]= { 		0,0.2,0.4,0.6,0.8,1.0,1.2,1.4,1.6,1.8,2.0,2.2,2.4,2.6,2.8,3.0,3.2,3.4,3.6,3.8,4.0 };
+	int len2 = sizeof(x_inputarr) / sizeof(double);
+	Matrix xin = arr2Mat(x_inputarr, len, 1);
+	Matrix gradientF = gradientFunc(myFuncTest, xin);
+```
+
+
+
+### newtonRaphsonFunc()
+
+----
+
+In this function, another usage of Newton-Raphson method is implemented : depending on function thus, input will be referenced function, derivative of it, initial x, and tolerance
+
+`double newtonRaphsonFunc(double myfunc(const double x), double mydfunc(const double x), double x0, double tol)`
+
+#### Parameters 
+
+* double myfunc(const double x) : referenced function declared in main
+* double mydfunc(const double x) : referenced function's derivative
+* double x0 : initial guess of approximation of true solution
+* double tol : tolerance that stops iteration when it is within given error interval
+
+#### Example Codes
+
+```c
+	double newtonresult;
+	double x0 = 2.0;
+	double tol = 0.00001;
+	double testresults= newtonRaphsonFunc(myFuncTest, mydFuncTest, x0, tol);
+	newtonresult=newtonRaphsonFunc(myFunc,mydFunc,x0,tol);
+```
+
+---
+
+## Numerical Integration
+
+---
+
+### trapz()
+
+---
+
+This function serves as numerical integration by using trapezoidal method. 
+
+`double trapz(double x[], double y[], int m)`
+
+#### Parameters
+
+* double x[] : input x datasets with length of m
+* double y[] : input y datasets with length of m, should have same length with x[]
+* int m : length of datasets
+* Returns integrated value.
+
+#### Example Codes
+
+```c
+
+	double x[] = { 0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60 };
+	double y[] = { 0, 3, 8, 20, 33, 42, 40, 48, 60, 12, 8, 4, 3 };
+	int M = sizeof(x) / sizeof(x[0]);
+	I_trapz = trapz(x, y, M);
+```
+
+### IntegrateRect()
+
+---
+
+
+
+This function serves as numerical integration by using rectangular method. It has the biggest error from true solution compared to other methods.
+
+`double IntegrateRect(double _x[], double _y[], int _m)`
+
+#### Parameters
+
+* double x[] : input x datasets with length of m
+* double y[] : input y datasets with length of m, should have same length with x[]
+* int m : length of datasets
+* Returns integrated value.
+
+#### Example Codes
+
+```c
+
+	double x[] = { 0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60 };
+	double y[] = { 0, 3, 8, 20, 33, 42, 40, 48, 60, 12, 8, 4, 3 };
+	int M = sizeof(x) / sizeof(x[0]);
+
+	double I_rect = IntegrateRect(x, y, M);
+```
+
+### Integral()
+
+---
+
+
+
+This function serves as numerical integration using Simpson 13 method.
+
+`double integral(double func(const double x), double a, double b, int n)`
+
+#### Parameters
+
+* double func(const double x) : Reference function declared in main
+* double a : lower limit of integral
+* double b : upper limit of integral
+* int n : number of point between interval : (b-a)/h, where h is difference.
+* Returns integrated value.
+
+#### Example Codes
+
+```c
+double I_simpson13 = 0;
+	int m = 12;
+	int a = -1;
+	int b = 1;
+
+	// ADD YOUR CODE HERE.   I_simpson13=integral()
+	I_simpson13 = integral(myFunc, a, b, m);
+```
+
+
+
+### Integral38()
+
+---
+
+
+
+This function serves as numerical integration using Simpson 38 method.
+
+`double integral38(double func(const double x), double a, double b, int n)`
+
+#### Parameters
+
+* double func(const double x) : Reference function declared in main
+* double a : lower limit of integral
+* double b : upper limit of integral
+* int n : number of point between interval : (b-a)/h, where h is difference.
+* Returns integrated value of Simpson 38
+
+#### Example Codes
+
+```c
+	int m = 12;
+	int a = -1;
+	int b = 1;
+	double I_simpson38 = 0.0;
+	I_simpson38 = integral38(myFunc, a, b, m);
+```
+
+### integralMid()
+
+---
+
+
+
+This function serves as numerical integration using midpoint integration method.
+
+`double integralMid(double x[], double y[], int m)`
+
+#### Parameters
+
+* double x[] : input x datasets with length of m
+* double y[] : input y datasets with length of m, should have same length with x[]
+* int m : length of datasets
+* Returns integrated value of midpoint integration
+
+#### Example Codes
+
+````c
+	double x[] = { 0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60 };
+	double y[] = { 0, 3, 8, 20, 33, 42, 40, 48, 60, 12, 8, 4, 3 };
+	int M = sizeof(x) / sizeof(x[0]);
+	double I_middle = integralMid(x, y, M);
+````
+
+---------
+
+## First Order Ordinary Differential Equations With Initial Value
+
+---
+
+### odeEU()
+
+---
+
+
+
+This function gives the solution for ordinary differential equation with initial value by using Euler's method. 
+
+`void odeEU(double func(const double t), double y[], double t0, double tf, double h)`
+
+#### Parameters
+
+* double func(const double t): reference function declared in main
+* double y[] : array that stores result values, with length of (b-a)/h
+* double t0 : initial time
+* double tf : final time
+* double h : arbitrary difference
+* Returns result y[i], and needs to plot it in MATLAB
+
+#### Example Codes
+
+```c
+	double a =0.0;
+	double b =0.1;
+	double h = 0.001;
+	double y[100] = {};
+	odeEU(myfunc, y, a, b, h);
+```
+
+### odeEM()
+
+---
+
+
+
+This function gives the solution for ordinary differential equation with initial value by using Euler's modified method.
+
+`void odeEM(double func(const double t), double y[], double t0, double tf, double h)`
+
+#### Parameters
+
+* double func(const double t): reference function declared in main
+* double y[] : array that stores result values, with length of (b-a)/h
+* double t0 : initial time
+* double tf : final time
+* double h : arbitrary difference
+* Returns result y[i], and needs to plot it in MATLAB
+
+#### Example Codes
+
+
+
+```c
+	double a =0.0;
+	double b =0.1;
+	double h = 0.001;
+	double y1[100] = {};
+	odeEM(myfunc, y1, a, b, h);
+```
+
+### odeRK2()
+
+---
+
+This function gives This function gives the solution for ordinary differential equation with initial value by using Runge-Kutta method. (Should be used only for 1st order Ordinary Differential Equation)
+
+`void odeRK2(double odeFunc(const double t, const double y), double y[], double t0, double tf, double h, double y0)`
+
+#### Parameters
+
+* double func(const double t, const double y): reference function declared in main
+* double y[] : array that stores result values, with length of (b-a)/h
+* double t0 : initial time
+* double tf : final time
+* double h : arbitrary difference
+* double y0 : initial value
+* Returns result y[i], and needs to plot it in MATLAB
+
+#### Examples Codes
+
+```c
+	double a = 0;
+	double b = 0.1;
+	double h = 0.001;
+	double y_RK2[200] = { 0.0 };
+	double v0 = 0;
+	odeRK2(odeFunc_rc, y_RK2, a, b, h, v0);
+```
+
+### odeRK4()
+
+----
+
+This function gives This function gives the solution for ordinary differential equation with initial value by using Runge-Kutta method. (Should be used only for 1st order Ordinary Differential Equation)
+
+`void odeRK4(double odeFunc(const double t, const double y), double y[], double t0, double tf, double h, double y0)`
+
+#### Parameters 
+
+* double func(const double t, const double y): reference function declared in main
+* double y[] : array that stores result values, with length of (b-a)/h
+* double t0 : initial time
+* double tf : final time
+* double h : arbitrary difference
+* double y0 : initial value
+* Returns result y[i], and needs to plot it in MATLAB
+
+#### Exampled Codes
+
+```C
+	double a = 0;
+	double b = 0.1;
+	double h = 0.001;
+	double y_RK4[200] = { 0.0 };
+	double v0 = 0;
+	odeRK4(odeFunc_rc, y_RK2, a, b, h, v0);
+```
+
+---
+
+## Second Order Ordinary Differential Equations With Initial Value
+
+---
+
+### sys2RK2()
+
+---
+
+This function gives This function gives the solution for ordinary differential equation with initial value by using Runge-Kutta method. (Used for 2nd or higher order Ordinary Differential Equation)
+
+`void sys2RK2(void odeFunc_sys2(const double t, const double Y[], double dYdt[]), double y1[], double y2[], double t0, double tf, double h, double y1_init, double y2_init)`
+
+#### Parameters
+
+* void odeFunc_sys2(const double t, const double Y[], double dYdt[]) : Referenced function declared in main
+* double y1[] : 
 
