@@ -445,6 +445,8 @@ Obviously, input parameters Low,Upper,Per should have size of (nxn).
     SolveLU(L,LU,permut,vecb);
 ```
 
+
+
 ### Inv()
 
 ----
@@ -463,6 +465,27 @@ This function serves as finding inverse matrix of given matrix A. In this functi
 ```c
 Matrix matA = txt2Mat(path, "prob1_matA");
 Matrix inv = inv(matA);
+```
+
+### inverse2()
+
+---
+
+This function serves as finding inverse matrix of given matrix A by using LU decomposition
+
+`void   inverse2(Matrix _A, Matrix _invA)`
+
+#### Parameters
+
+* Matrix _A : Given Matrix A, should be (nxn) size
+* Matrix _invA : Storing inverse matrix values, which will be complete inverse matrix at the end of the function
+
+#### Example Codes
+
+```c
+Matrix A = txtMat(path,"prob1_matA");
+Matrix Ainv = createMat(A.rows,A.cols);
+inverse2(A,Ainv);
 ```
 
 
@@ -578,6 +601,102 @@ int main(int argc, char* argv[])
 	return 0;
 }
 ```
+
+### Residuals()
+
+---
+
+This function serves as residual of linear curve fitting, which refers to 
+$$
+r_k = y_k - (a_1*x_k+a_0)
+$$
+By using this function, total error can be found.
+
+`void residual(Matrix _x, Matrix _y,Matrix _r,double n, Matrix _a)`
+
+#### Parameters
+
+* Matrix _x : input datasets which has (nx1) size
+* Matrix _y : input datasets which has same size with _x
+* Matrix _r : storing residual values in matrix, (nx1) size
+* double n : The number of datasets
+* Matrix _a : curve fitting coefficients, (2x1) size
+
+At the end of the function, _r matrix will store the residual values
+
+#### Example Codes
+
+```c
+int main(int argc, char* argv[])
+{
+	int M = 6;
+	double T_array[] = { 30, 40, 50, 60, 70, 80 };
+	double P_array[] = { 1.05, 1.07, 1.09, 1.14, 1.17, 1.21 };
+
+	Matrix T = arr2Mat(T_array, M, 1);
+	Matrix P = arr2Mat(P_array, M, 1);
+	Matrix z = linearFit(T, P);
+	Matrix r = createMat(M,1);
+	residual(T,P,r,M,z);
+
+	system("pause");
+	return 0;
+}
+```
+
+
+
+### TotalError()
+
+----
+
+This function serves as finding the total error of linear curve fitting by squaring residual of each term
+
+`void TotalError(Matrix _x, Matrix _y, double n, Matrix _a, double Er, Matrix _residual)`
+
+#### Parameters
+
+* Matrix _x : input datasets which has (nx1) size
+* Matrix _y : input datasets which has same size with _x
+* Matrix _a : curve fitting coefficients, (2x1) size
+* double Er : storing total values
+* Matrix _residual : residual values, (nx1) size
+
+### curve()
+
+----
+
+This function serves as curve fitting for higher order, such as 2, 3, 4.. etc. 
+
+`Matrix curve(Matrix _x, Matrix _y, int od)`
+
+#### Parameters
+
+* Matrix _x : input datasets which has (nx1) size
+* Matrix _y : input datasets which has same size with _x
+* int od : order of curve fitting
+
+#### Example Codes
+
+```c
+int main(int argc, char* argv[])
+{
+	int M = 6;
+	double T_array[] = { 30, 40, 50, 60, 70, 80 };
+	double P_array[] = { 1.05, 1.07, 1.09, 1.14, 1.17, 1.21 };
+
+	Matrix T = arr2Mat(T_array, M, 1);
+	Matrix P = arr2Mat(P_array, M, 1);
+    int od = 2;
+    Matrix c = createMat(M,1);
+    c = curve(T,P,od);
+    
+    return 0;
+}
+
+```
+
+
 
 ### arr2Mat()
 
@@ -1003,7 +1122,7 @@ This function gives This function gives the solution for ordinary differential e
 * double y0 : initial value
 * Returns result y[i], and needs to plot it in MATLAB
 
-#### Examples Codes
+#### Example Codes
 
 ```c
 	double a = 0;
@@ -1032,7 +1151,7 @@ This function gives This function gives the solution for ordinary differential e
 * double y0 : initial value
 * Returns result y[i], and needs to plot it in MATLAB
 
-#### Exampled Codes
+#### Example Codes
 
 ```C
 	double a = 0;
@@ -1053,12 +1172,77 @@ This function gives This function gives the solution for ordinary differential e
 
 ---
 
-This function gives This function gives the solution for ordinary differential equation with initial value by using Runge-Kutta method. (Used for 2nd or higher order Ordinary Differential Equation)
+This function gives the solution for ordinary differential equation with initial value by using Runge-Kutta method. (Used for 2nd or higher order Ordinary Differential Equation)
 
 `void sys2RK2(void odeFunc_sys2(const double t, const double Y[], double dYdt[]), double y1[], double y2[], double t0, double tf, double h, double y1_init, double y2_init)`
 
 #### Parameters
 
 * void odeFunc_sys2(const double t, const double Y[], double dYdt[]) : Referenced function declared in main
-* double y1[] : 
+* double y1[] : y(t) values
+* double y2[] : dy/dt values = z(t)
+* double t0 : initial condition(left end of interval)
+* double tf : Final condition(right end of interval)
+* double h : difference
+* double y1_init : initial condition of y(t)
+* double y2_init : initial condition of y'(t) = z(t)
+
+#### Example Codes
+
+```c
+	double t0 = 0;
+	double tf = 1;
+	h = 0.01;
+	N = (tf - t0) / h + 1;
+	double y[200] = { 0 };
+	double v[200] = { 0 };
+
+	// Initial values
+	double y0 = 0;
+	v0 = 0.2;
+
+	// ODE solver: RK2
+
+	sys2rk2(odeFunc_mck, y, v, t0, tf, h, y0, v0);
+```
+
+### sysRK4()
+
+---
+
+This function gives the solution for ordinary differential equation with initial value by using Runge-Kutta 4 method.
+
+`void sys2RK4(void odeFunc_sys2(const double t, const double Y[], double dYdt[]), double y1[], double y2[], double t0, double tf, double h, double y1_init, double y2_init)`
+
+#### Parameters
+
+* void odeFunc_sys2(const double t, const double Y[], double dYdt[]) : Referenced function declared in main
+* double y1[] : y(t) values
+* double y2[] : dy/dt values = z(t)
+* double t0 : initial condition(left end of interval)
+* double tf : Final condition(right end of interval)
+* double h : difference
+* double y1_init : initial condition of y(t)
+* double y2_init : initial condition of y'(t) = z(t)
+
+
+
+#### Example Codes
+
+```c
+	double t0 = 0;
+	double tf = 1;
+	h = 0.01;
+	N = (tf - t0) / h + 1;
+	double y[200] = { 0 };
+	double v[200] = { 0 };
+
+	// Initial values
+	double y0 = 0;
+	v0 = 0.2;
+
+	// ODE solver: RK4
+
+	sys2RK4(odeFunc_mck, y, v, t0, tf, h, y0, v0);
+```
 
