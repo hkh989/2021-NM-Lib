@@ -12,7 +12,7 @@ finds an approximation for the root of real-valued function, f(x)=-0
 
  `double bisection(double _a, double _b, double _tol);`
 
-### Parameters
+#### Parameters
 
 * _a : initial values of x, left side of interval
 
@@ -20,9 +20,7 @@ finds an approximation for the root of real-valued function, f(x)=-0
 
 * _tol : tolerance that stops iteration when it is within given error interval
 
-  
-
-  ## Example code
+  #### Example Codes
 
   ```c
   	double tol = 0.0000001;
@@ -117,7 +115,7 @@ This function serves as addition of two matrices. Two matrices should have equal
 
 * Matrix _B : Matrix B, should be same size with Matrix A
 
-  ### Example Codes
+  #### Example Codes
 
   ```c
   Matrix matA = txt2Mat(path, "prob1_matA");
@@ -467,29 +465,6 @@ Matrix matA = txt2Mat(path, "prob1_matA");
 Matrix inv = inv(matA);
 ```
 
-### inverse2()
-
----
-
-This function serves as finding inverse matrix of given matrix A by using LU decomposition
-
-`void   inverse2(Matrix _A, Matrix _invA)`
-
-#### Parameters
-
-* Matrix _A : Given Matrix A, should be (nxn) size
-* Matrix _invA : Storing inverse matrix values, which will be complete inverse matrix at the end of the function
-
-#### Example Codes
-
-```c
-Matrix A = txtMat(path,"prob1_matA");
-Matrix Ainv = createMat(A.rows,A.cols);
-inverse2(A,Ainv);
-```
-
-
-
 ### QRFact()
 
 ---
@@ -661,6 +636,29 @@ This function serves as finding the total error of linear curve fitting by squar
 * Matrix _a : curve fitting coefficients, (2x1) size
 * double Er : storing total values
 * Matrix _residual : residual values, (nx1) size
+
+#### Example Codes
+
+```c
+int main(int argc, char* argv[])
+{
+	int M = 6;
+	double T_array[] = { 30, 40, 50, 60, 70, 80 };
+	double P_array[] = { 1.05, 1.07, 1.09, 1.14, 1.17, 1.21 };
+
+	Matrix T = arr2Mat(T_array, M, 1);
+	Matrix P = arr2Mat(P_array, M, 1);
+	Matrix z = linearFit(T, P);
+	Matrix r = createMat(M,1);
+	residual(T,P,r,M,z);
+    double Er;
+	TotalError(T,P,M,z,Er,r);
+	system("pause");
+	return 0;
+}
+```
+
+
 
 ### curve()
 
